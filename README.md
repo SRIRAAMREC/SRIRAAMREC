@@ -117,8 +117,8 @@ I enjoy building practical applications, working with data, and exploring modern
 # 📊 GitHub Stats
 
 <p align="center">
-<img height="180" src="https://github-readme-stats.vercel.app/api?username=SRIRAAMREC&show_icons=true&theme=tokyonight&hide_border=true" />
-<img height="180" src="https://github-readme-stats.vercel.app/api/top-langs/?username=SRIRAAMREC&layout=compact&theme=tokyonight&hide_border=true" />
+  <img src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=SRIRAAMREC&theme=github_dark" />
+  <img src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=SRIRAAMREC&theme=github_dark" />
 </p>
 
 ---
@@ -126,7 +126,7 @@ I enjoy building practical applications, working with data, and exploring modern
 ## 🔥 GitHub Streak
 
 <p align="center">
-<img src="https://streak-stats.demolab.com?user=SRIRAAMREC&theme=tokyonight&hide_border=true" />
+  <img src="https://streak-stats.demolab.com/?user=SRIRAAMREC&theme=dark&hide_border=true" />
 </p>
 
 ---
@@ -134,7 +134,7 @@ I enjoy building practical applications, working with data, and exploring modern
 ## 💬 Random Dev Quote
 
 <p align="center">
-<img src="https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight" />
+  <img src="https://quotes-github-readme.vercel.app/api?type=horizontal&theme=dark" />
 </p>
 
 ---
