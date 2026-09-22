@@ -1,0 +1,27 @@
+name: Refresh profile contribution art
+on:
+  schedule:
+    - cron: '17 1 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: pip install requests beautifulsoup4
+      - run: python scripts/fetch_contributions.py
+        env:
+          GH_PROFILE_USER: SRIRAAMREC
+      - run: python scripts/render_heatmap_svg.py
+      - name: Commit refreshed heatmap
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/contributions.json assets/contrib-heatmap.svg
+          git diff --cached --quiet || git commit -m 'chore: refresh contribution heatmap'
+          git push
