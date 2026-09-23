@@ -1,18 +1,86 @@
-import os, json, re
-from datetime import date, timedelta
+import os
+import json
 import requests
-from bs4 import BeautifulSoup
 
-user=os.environ.get('GH_PROFILE_USER','SRIRAAMREC')
-url=f'https://github.com/users/{user}/contributions'
-r=requests.get(url,headers={'User-Agent':'Mozilla/5.0'},timeout=30)
-r.raise_for_status()
-soup=BeautifulSoup(r.text,'html.parser')
-rows=[]
-for rect in soup.select('rect[data-date]'):
-    rows.append({'date':rect.get('data-date'),'level':int(rect.get('data-level','0'))})
+user = os.environ.get("GH_PROFILE_USER", "SRIRAAMREC")
+token = os.environ.get("GITHUB_TOKEN")
+
+if not token:
+    raise RuntimeError("GITHUB_TOKEN is not available.")
+
+query = """
+query($login: String!) {
+  user(login: $login) {
+    contributionsCollection {
+      contributionCalendar {
+        weeks {
+          contributionDays {
+            date
+            contributionLevel
+          }
+        }
+      }
+    }
+  }
+}
+"""
+
+response = requests.post(
+    "https://api.github.com/graphql",
+    json={
+        "query": query,
+        "variables": {"login": user}
+    },
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "User-Agent": "SRIRAAMREC-profile-art"
+    },
+    timeout=30
+)
+
+response.raise_for_status()
+
+result = response.json()
+
+if "errors" in result:
+    raise RuntimeError(f"GitHub GraphQL error: {result['errors']}")
+
+calendar = (
+    result.get("data", {})
+    .get("user", {})
+    .get("contributionsCollection", {})
+    .get("contributionCalendar", {})
+)
+
+weeks = calendar.get("weeks", [])
+
+if not weeks:
+    raise RuntimeError(f"No contribution calendar returned for {user}.")
+
+level_map = {
+    "NONE": 0,
+    "FIRST_QUARTILE": 1,
+    "SECOND_QUARTILE": 2,
+    "THIRD_QUARTILE": 3,
+    "FOURTH_QUARTILE": 4,
+}
+
+rows = []
+
+for week in weeks:
+    for day in week.get("contributionDays", []):
+        rows.append({
+            "date": day["date"],
+            "level": level_map.get(day["contributionLevel"], 0)
+        })
+
 if not rows:
-    raise RuntimeError('GitHub did not return contribution cells. Try again in a minute.')
-os.makedirs('data',exist_ok=True)
-with open('data/contributions.json','w',encoding='utf-8') as f: json.dump(rows,f,indent=2)
-print(f'Saved {len(rows)} contribution cells for {user}.')
+    raise RuntimeError(f"No contribution days returned for {user}.")
+
+os.makedirs("data", exist_ok=True)
+
+with open("data/contributions.json", "w", encoding="utf-8") as f:
+    json.dump(rows, f, indent=2)
+
+print(f"Saved {len(rows)} contribution cells for {user}.")
